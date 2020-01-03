@@ -1,2 +1,4 @@
 # sequelize-base-cache
-基于 Sequelize 的 数据缓存器
+DB 数据缓存器
+
+- 支持 ioredis + sequelize

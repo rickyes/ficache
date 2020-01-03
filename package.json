@@ -1,0 +1,31 @@
+{
+  "name": "db-base-cache",
+  "version": "0.1.1",
+  "description": "DB 缓存器",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rickyes/sequelize-base-cache.git"
+  },
+  "keywords": [
+    "sequelize",
+    "cache",
+    "redis"
+  ],
+  "author": "Ricky 泽阳",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/rickyes/sequelize-base-cache/issues"
+  },
+  "homepage": "https://github.com/rickyes/sequelize-base-cache#readme",
+  "dependencies": {
+    "lodash": "^4.17.15",
+    "sdk-base": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^13.1.1"
+  }
+}

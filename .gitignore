@@ -1,0 +1,17 @@
+.idea
+/node_modules
+.DS_store
+config/config.js
+*.log
+Untitled
+.vscode
+/logs
+coverage
+.nyc_output
+test.js
+package-lock.json
+temp
+out
+data
+
+sequelizeMeta.json
