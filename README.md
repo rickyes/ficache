@@ -1,4 +1,4 @@
 # ficache
-DB 数据缓存器
+The secondary life cycle cache of the database.
 
 - 支持 ioredis + sequelize
