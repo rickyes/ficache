@@ -1,4 +1,4 @@
-# sequelize-base-cache
+# ficache
 DB 数据缓存器
 
 - 支持 ioredis + sequelize
