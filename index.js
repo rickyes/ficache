@@ -32,7 +32,7 @@ class BaseCache extends Base {
     this.log && this.log[level](...msg);
   }
 
-  async run(method, tables, args) {
+  async run(method, tables, ...args) {
     const keyParams = {
       method,
       params: args,
