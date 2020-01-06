@@ -20,10 +20,16 @@ class BaseCache extends Base {
     this.cacheClient = options.cacheClient;
     this.model = options.model;
     this.log = options.logger;
+    this.batchKeyCount = options.batchKeyCount || 1000;
+    this.mapKeyPrefix = `${this.namespace}:${this.mappingPrefix}`;
   }
 
-  toLog(msg, key) {
+  toExecLog(msg, key) {
     this.log && this.log.info(`Executed (cache): key/${key}`, JSON.stringify(msg));
+  }
+
+  toLog(level, ...msg) {
+    this.log && this.log[level](...msg);
   }
 
   async run(method, tables, args) {
@@ -34,7 +40,7 @@ class BaseCache extends Base {
     const key = this.key(keyParams, tables);
     const cache = await this.cacheClient.get(key);
     if (cache) {
-      this.toLog(keyParams, key);
+      this.toExecLog(keyParams, key);
       return JSON.parse(cache);
     }
     const data = await this.runFromDatabase(method, args);
@@ -50,7 +56,7 @@ class BaseCache extends Base {
   async setCacheMap(key, tables) {
     const self = this;
     return Promise.all(tables.map(t => {
-      return self.cacheClient.sadd(`${self.namespace}:${self.mappingPrefix}:${t}`, key);
+      return self.cacheClient.sadd(`${self.mapKeyPrefix}:${t}`, key);
     }));
   }
 
@@ -74,6 +80,24 @@ class BaseCache extends Base {
       res = results;
     }
     return res;
+  }
+
+
+  batchClearCache(tables = []) {
+    const self = this;
+    tables.forEach(async t => {
+      // 子进程无法传递 cache 可用句柄, 暂时在当前进程实现删除
+      let cursor = null;
+      while (cursor !== 0) {
+        const mapKey = `${self.mapKeyPrefix}:${t}`;
+        const result = await self.cacheClient.sscan(mapKey, cursor || 0, 'match', '*', 'count', self.batchKeyCount);
+        cursor = Number(result[0]);
+        result[1].forEach(k => {
+          self.clearCache(k);
+          self.cacheClient.srem(mapKey, k);
+        });
+      }
+    });
   }
 
   clearCache(key) {
