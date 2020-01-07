@@ -10,6 +10,20 @@ const isNullOrUndefined = value => value === null || value === undefined;
 
 class BaseCache extends Base {
 
+  /**
+   * @param {Object} options 
+   * @param {import('sequelize').sequelize} options.dbClient
+   * @param {import('ioredis').Redis} options.cacheClient
+   * @param {import('sequelize').ModelType} options.model
+   * @param {String} options.namespace? cache namespace
+   * @param {String} options.mappingPrefix? cache table mapping prefix
+   * @param {String} options.dataPrefix? cache prefix
+   * @param {Number} options.ttl? cache data key ttl (second)
+   * @param {import('log')} options.log? exec log
+   * @param {Number} options.batchKeyCount? batch del key count
+   * @param {Boolean} options.readCache? enable readCache
+   * @param {Boolean} options.updateCache? enable updateCache
+   */
   constructor(options) {
     super();
     assert(options.dbClient, 'Options dbCLient is Required');
@@ -69,6 +83,12 @@ class BaseCache extends Base {
     return true;
   }
 
+  /**
+   * 执行缓存操作
+   * @param {String} method model method
+   * @param {Array<String>} tables relevance tables name
+   * @param  {...any} args query params
+   */
   async run(method, tables, ...args) {
     if (!this.isReadCache(args[0])) {
       return this.runFromDatabase(method, args);
@@ -123,6 +143,10 @@ class BaseCache extends Base {
   }
 
 
+  /**
+   * 批量删除缓存
+   * @param {Array<String>} tables tables name
+   */
   batchClearCache(tables = []) {
     const self = this;
     tables.forEach(async t => {
