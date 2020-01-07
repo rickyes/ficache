@@ -5,6 +5,9 @@ const Base = require('sdk-base');
 const crypto = require('crypto');
 const NOT_CACHE = Symbol.for('ficache#notCache');
 
+const isNullOrUndefined = value => value === null || value === undefined;
+
+
 class BaseCache extends Base {
 
   constructor(options) {
@@ -23,6 +26,8 @@ class BaseCache extends Base {
     this.log = options.logger;
     this.batchKeyCount = options.batchKeyCount || 1000;
     this.mapKeyPrefix = `${this.namespace}:${this.mappingPrefix}`;
+    this.readCache = isNullOrUndefined(options.readCache) ? true : options.readCache;
+    this.updateCache = isNullOrUndefined(options.updateCache) ? true : options.updateCache;
   }
 
   toExecLog(msg, key) {
@@ -33,8 +38,35 @@ class BaseCache extends Base {
     this.log && this.log[level](...msg);
   }
 
+  /**
+   * 判断是否读取缓存
+   * 当 options.readCache === false 时，where[NOT_CACHE] 默认为 true
+   * 当 options.readCache === true 时，where[NOT_CACHE] 默认为 false
+   * 
+   * 1、options.readCache === true and where[NOT_CACHE]:true  =>  return false
+   * 2、options.readCache === true and where[NOT_CACHE]:false  =>  return true
+   * 3、options.readCache === false and where[NOT_CACHE]:false  =>  return true
+   * 4、options.readCache === false and where[NOT_CACHE]:true  =>  return false
+   * @param {Object} options db 查询条件 
+   */
+  isReadCache(options) {
+    if (!options && !options.where) {
+      return false;
+    }
+
+    const where = options.where;
+
+    const notCacheDefault = !this.readCache;
+    const notCache = isNullOrUndefined(where[NOT_CACHE]) ? notCacheDefault : where[NOT_CACHE];
+
+    if (notCache) {
+      return false;
+    }
+    return true;
+  }
+
   async run(method, tables, ...args) {
-    if (args[0] && args[0].where[NOT_CACHE]) {
+    if (!this.isReadCache(args[0])) {
       return this.runFromDatabase(method, args);
     }
     const keyParams = {
