@@ -1,6 +1,6 @@
 {
   "name": "ficache",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "The secondary life cycle cacher of the database",
   "main": "index.js",
   "scripts": {
