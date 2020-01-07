@@ -3,6 +3,7 @@
 const assert = require('assert');
 const Base = require('sdk-base');
 const crypto = require('crypto');
+const NOT_CACHE = Symbol.for('ficache#notCache');
 
 class BaseCache extends Base {
 
@@ -33,6 +34,9 @@ class BaseCache extends Base {
   }
 
   async run(method, tables, ...args) {
+    if (args[0] && args[0].where[NOT_CACHE]) {
+      return this.runFromDatabase(method, args);
+    }
     const keyParams = {
       method,
       params: args,
@@ -129,5 +133,7 @@ class BaseCache extends Base {
   }
 
 }
+
+BaseCache.NOT_CACHE = NOT_CACHE;
 
 module.exports = BaseCache;
