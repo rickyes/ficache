@@ -108,3 +108,6 @@ exports.addUser = async (body) => {
 ```sh
 Executed (delCache): mapKey/sequelize_base_cache:cache_keymap:bas_user
 ```
+
+## Author
+Polix © [Ricky 泽阳](https://github.com/rickyes), Released under the MIT License.  
