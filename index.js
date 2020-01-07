@@ -34,6 +34,10 @@ class BaseCache extends Base {
     this.log && this.log.info(`Executed (cache): key/${key}`, JSON.stringify(msg));
   }
 
+  toDelLog(mapKey) {
+    this.log && this.log.info(`Executed (delCache): mapKey/${mapKey}`);
+  }
+
   toLog(level, ...msg) {
     this.log && this.log[level](...msg);
   }
@@ -122,10 +126,11 @@ class BaseCache extends Base {
   batchClearCache(tables = []) {
     const self = this;
     tables.forEach(async t => {
+      const mapKey = `${self.mapKeyPrefix}:${t}`;
+      self.toDelLog(mapKey);
       // 子进程无法传递 cache 可用句柄, 暂时在当前进程实现删除
       let cursor = null;
       while (cursor !== 0) {
-        const mapKey = `${self.mapKeyPrefix}:${t}`;
         const result = await self.cacheClient.sscan(mapKey, cursor || 0, 'match', '*', 'count', self.batchKeyCount);
         cursor = Number(result[0]);
         result[1].forEach(k => {
