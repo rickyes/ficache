@@ -7,6 +7,8 @@ const NOT_CACHE = Symbol.for('ficache#notCache');
 
 const isNullOrUndefined = value => value === null || value === undefined;
 
+const FindMethods = ['findOne', 'findAll', 'count', 'find', 'findAndCountAll'];
+const UpdateMethods = ['create', 'update', 'destroy'];
 
 class BaseCache extends Base {
 
@@ -42,6 +44,14 @@ class BaseCache extends Base {
     this.mapKeyPrefix = `${this.namespace}:${this.mappingPrefix}`;
     this.readCache = isNullOrUndefined(options.readCache) ? true : options.readCache;
     this.updateCache = isNullOrUndefined(options.updateCache) ? true : options.updateCache;
+  }
+
+  getFindMethods() {
+    return FindMethods;
+  }
+
+  getUpdateMethods() {
+    return UpdateMethods;
   }
 
   toExecLog(msg, key) {
